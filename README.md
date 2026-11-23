@@ -1,91 +1,105 @@
 # Heart Disease Detection Using Machine Learning
 
-## 1. Project Overview
+## Project Overview
 
-This project focuses on developing and evaluating machine learning models to predict the presence of heart disease using clinical data.
+This project implements and compares five supervised machine learning classification algorithms to predict the presence of heart disease using clinical attributes from the UCI Heart Disease Dataset.
 
-The objective is to explore different classification algorithms, understand their performance, and compare their ability to distinguish between patients with and without heart disease.
+The project covers data preprocessing, model training, hyperparameter tuning, cross-validation, performance evaluation, and model persistence.
 
-This is an educational machine learning project and is not intended for clinical diagnosis.
+**Project status:** Five machine learning models implemented and evaluated.
 
-## 2. Dataset
+## Dataset
 
-**Dataset:** UCI Heart Disease Dataset
+**Source:** UCI Heart Disease Dataset
 
-- Original records: 920
-- Original features: 16
+- Total records: 920
+- Original columns: 16
 - Target variable: `num`
+- Problem type: Binary classification
+- Train-test split: 80:20, stratified
 
-The original target variable was converted into a binary classification problem:
+### Target Classification
 
-- `0` – No heart disease
-- `1` – Presence of heart disease
+| Value | Meaning |
+|---|---|
+| 0 | No heart disease |
+| 1 | Presence of heart disease |
 
-### Data preprocessing
+The original target was converted into binary labels using `num > 0`.
+
+## Data Preprocessing
 
 The preprocessing workflow includes:
 
-- Removing the patient identifier (`id`).
-- Converting the target into binary classes.
-- Handling invalid zero values in selected clinical features.
-- Handling missing numerical and categorical values.
-- Encoding categorical variables.
-- Scaling numerical features where required.
-- Splitting the dataset into training and testing sets using stratification.
+- Removing the patient identifier (`id`) and excluding the dataset-source column.
+- Handling invalid zero values in selected clinical measurements.
+- Imputing missing numerical values using median imputation.
+- Imputing missing categorical values.
+- Encoding categorical variables using OneHotEncoder.
+- Applying StandardScaler to numerical features for scale-sensitive algorithms.
+- Using consistent training and testing partitions.
 
-## 3. Machine Learning Models
+Preprocessing is integrated into scikit-learn pipelines to reduce data leakage.
 
-Three classification algorithms have been implemented.
+## Machine Learning Models
 
-### 1. Logistic Regression
+Five classification algorithms have been implemented:
 
-- Used as the initial classification model.
-- Numerical features were imputed and standardized.
-- Categorical features were imputed and one-hot encoded.
-- Evaluated using classification metrics and ROC-AUC.
-
-### 2. K-Nearest Neighbors (KNN)
-
-- Implemented using the KNN classification algorithm.
-- Numerical feature scaling was applied because KNN is distance-based.
-- Hyperparameter exploration was performed to select the number of neighbors.
-- Final model: KNN with K = 16.
-- Evaluated using classification metrics and ROC-AUC.
-
-### 3. Decision Tree
-
-- Implemented using `DecisionTreeClassifier`.
-- Numerical scaling was not required.
-- Missing values were imputed and categorical features were one-hot encoded.
-- Evaluated using classification metrics.
-- Five-fold stratified cross-validation was performed using ROC-AUC.
-
-## 4. Model Evaluation
-
-The models are evaluated using the following metrics:
-
-| Metric | Purpose |
+| Model | Configuration |
 |---|---|
-| Accuracy | Overall prediction correctness |
-| Precision | Correctness of positive predictions |
-| Recall | Ability to identify positive cases |
-| Specificity | Ability to identify negative cases |
-| F1 Score | Balance between precision and recall |
-| ROC-AUC | Ability to distinguish between the two classes |
+| Logistic Regression | Scaled numerical features and encoded categorical features |
+| K-Nearest Neighbors | K = 16 |
+| Decision Tree | Baseline DecisionTreeClassifier |
+| Random Forest | 100 estimators, baseline configuration |
+| Support Vector Machine | Tuned linear kernel, C = 0.1 |
 
-A common held-out test set is used to compare all three models.
+### SVM Hyperparameter Tuning
 
-Five-fold stratified cross-validation is also used to assess Decision Tree performance and consistency.
+SVM was optimized using GridSearchCV with five-fold stratified cross-validation.
 
-## 5. Project Structure
+Selected parameters:
+
+- Kernel: Linear
+- C: 0.1
+- Cross-validation ROC-AUC: 0.8966
+
+Final SVM test results:
+
+| Metric | Value |
+|---|---:|
+| Accuracy | 0.8478 |
+| ROC-AUC | 0.9132 |
+| Class 1 Precision | 0.84 |
+| Class 1 Recall | 0.90 |
+| Class 1 F1-score | 0.87 |
+
+## Model Evaluation
+
+Models are evaluated using:
+
+- Accuracy
+- Precision
+- Recall (Sensitivity)
+- Specificity
+- F1-score
+- ROC-AUC
+- Confusion Matrix
+- Classification Report
+
+Cross-validation is used to assess performance consistency and support model selection.
+
+The consolidated results are stored in `reports/model_comparison.csv`.
+
+## Project Structure
 
 ```text
 HDD/
-│
 ├── models/
 │   ├── logistic_r_model.pkl
-│   ├── knn_model.pkl
-│   └── decision_tree_model.pkl
+│   ├── heart_disease_knn.pkl
+│   ├── decision_tree_model.pkl
+│   ├── random_forest_model.pkl
+│   └── svm_model.pkl
 │
 ├── reports/
 │   └── model_comparison.csv
@@ -93,49 +107,61 @@ HDD/
 ├── notebooks/
 │   ├── 01_logistic_regression.ipynb
 │   ├── 02_knn_model.ipynb
-│   └── 03_decision_tree.ipynb
+│   ├── 03_decision_tree.ipynb
+│   ├── 04_random_forest.ipynb
+│   └── 05_svm_model.ipynb
 │
+├── preprocessing.py
 ├── heart_disease_uci.csv
 ├── heart_disease_cleaned.csv
-├── preprocessing.py
 └── README.md
 ```
 
-*Note: Filenames and folder contents may vary as the project evolves.*
+*The structure represents the intended organization; exact notebook filenames may differ.*
 
-## 6. Technologies Used
+## Technologies Used
 
 - Python
 - Pandas
 - NumPy
+- Scikit-learn
 - Matplotlib
 - Seaborn
-- Scikit-learn
 - Joblib
 - Jupyter Notebook
 
-## 7. Current Project Progress
+## Project Progress
 
-- [x] Dataset exploration
-- [x] Data cleaning and preprocessing
-- [x] Binary target conversion
-- [x] Logistic Regression implementation
-- [x] KNN implementation and K selection
-- [x] Decision Tree implementation
-- [x] Five-fold cross-validation for Decision Tree
-- [x] Model evaluation and comparison
-- [x] Saving trained models
-- [x] Saving model comparison report
+- [x] Exploratory Data Analysis
+- [x] Data Cleaning
+- [x] Feature Preprocessing
+- [x] Logistic Regression
+- [x] KNN
+- [x] Decision Tree
+- [x] Random Forest
+- [x] Support Vector Machine
+- [x] SVM Hyperparameter Tuning
+- [x] Model Evaluation
+- [x] Cross-Validation
+- [x] Model Persistence
+- [x] Model Comparison Report
 
-## 8. Future Work
+## Limitations
 
-- Implement Random Forest.
-- Implement Support Vector Machine (SVM).
-- Compare all models using consistent evaluation metrics.
-- Perform further model optimization.
-- Analyze feature importance and model interpretability.
-- Identify the most suitable model based on evaluation results.
+- The dataset contains missing clinical information and differences between contributing data sources.
+- Results are based on a limited dataset and a single held-out test partition.
+- The test set has been consulted during model development, so the reported results should not be interpreted as a fully independent external validation.
+- Some clinical features may not be available during an initial patient assessment.
+- Model predictions have not been clinically validated.
 
-## 9. Disclaimer
+## Future Improvements
 
-This project is developed for educational and machine learning practice purposes. Its predictions should not be used as a substitute for professional medical advice, diagnosis, or treatment.
+- Perform external validation on an independent dataset.
+- Investigate feature selection and model interpretability.
+- Evaluate probability calibration.
+- Develop an interactive prediction interface.
+- Improve reproducibility and deployment documentation.
+
+## Disclaimer
+
+This project is intended strictly for educational and research purposes. It is not a clinically validated medical diagnostic system and must not be used to make healthcare decisions.
